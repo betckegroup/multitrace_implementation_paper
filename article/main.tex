@@ -129,8 +129,8 @@
 
 % Authors: full names plus addresses.
 \author{Timo Betcke\thanks{University College London, London, UK (\email{t.betcke@ucl.ac.uk}).}
-\and Xavier Claeys\thanks{Sorbonne Universit\'es, UPMC Univ Paris 06, CNRS, INRIA, UMR 7598, Laboratoire Jacques-Louis Lions, \'Equipe Alpines, 4, place Jussieu 75005, Paris, France
-  (\email{claeys@ljll.math.upmc.fr}).}
+%\and Xavier Claeys\thanks{Sorbonne Universit\'es, UPMC Univ Paris 06, CNRS, INRIA, UMR 7598, Laboratoire Jacques-Louis Lions, \'Equipe Alpines, 4, place Jussieu 75005, Paris, France
+%  (\email{claeys@ljll.math.upmc.fr}).}
 \and Paul Escapil-Inchausp\'{e}\thanks{School of Engineering, Pontificia Universidad Cat\'olica de Chile, Santiago, Chile (\email{pescapil@uc.cl}).}
 \and Carlos Jerez-Hanckes\thanks{Faculty of Engineering and Sciences, Universidad Adolfo Ib\'a\~{n}ez, Santiago, Chile (\email{carlos.jerez@uai.cl}).}}
 
@@ -140,7 +140,8 @@
 \ifpdf
 \hypersetup{
   pdftitle={Practical implementations of multiple-trace methods for acoustic and electromagnetic scattering in complex media},
-  pdfauthor={T. Betcke, X. Claeys, P. Escapil-Enchausp\`{e}, C. Jerez-Hanckes}
+  pdfauthor={T. Betcke, %X. Claeys,
+  P. Escapil-Enchausp\`{e}, C. Jerez-Hanckes}
 }
 \fi
 
@@ -221,7 +222,7 @@ To set the transmission problem for both acoustic and electromagnetic cases, we 
 $\fL_{k_i}$ & $- \Delta\U^i  - k^2\U^i$&  $-\bcurl \bcurl\U^i - k_i^2 \U^i $ \\ \hline
  \multirow{2}{*}{{\bf Traces}} & $\gamma^i_0 \U^i:= \U^i|_{\Gamma_i}$ & $\gamma^i_0\U^i  := \U^i|_{\Gamma_i} \times \bn_i$ \\
   & $\gamma^i_1 \U^i:= \bn_i \cdot \nabla \U^i|_{\Gamma_i}$  & $\gamma^i_1 \U^i: = \frac{1}{\imath k_i}(\bn_i \times \bcurl \U^i|_{\Gamma_i})$\\\hline
-  \multirow{2}{*}{$\fu_i$}  & \multirow{2}{*}{$\Big(\gamma^i_0 \U^i, \frac{1}{\mu_i}\gamma^i_1\U^i\Big)$} &  \multirow{2}{*}{$\Big(\gamma^i_0 \U^i, \frac{k_i}{\mu_i}\gamma^i_1\U^i\Big)$} \\
+  \multirow{2}{*}{$\bu_i$}  & \multirow{2}{*}{$\Big(\gamma^i_0 \U^i, \frac{1}{\mu_i}\gamma^i_1\U^i\Big)$} &  \multirow{2}{*}{$\Big(\gamma^i_0 \U^i, \frac{k_i}{\mu_i}\gamma^i_1\U^i\Big)$} \\
   & & \\\hline
   \multirow{2}{*}{$\IH(\Gamma_i)$} & \multirow{2}{*}{$H^{-1/2}(\Gamma_i)\times H^{1/2}(\Gamma_i) $} & \multirow{2}{*}{$\bH_\times^{-1/2}(\divg_\Gamma, \Gamma_i)^2$ }\\
   & & \\\hline
@@ -246,7 +247,7 @@ In fourth row we set $\fu_i$ the scaled traces which will be the unknowns in mul
 %\todo{Add a remark concerning formulation for $\mathbf{e} \times \bn $ and $\mathbf{h} \times \bn$ as the unknowns}
 %\end{remark}
 
-Next, we describe the boundary transmission conditions at each interface in  first row of \Cref{tab:TransmissionConditions}. These are reformulated in terms of unknowns $\fu_i,\fu_j$ in second row, along with the expression of the transmission matrix $\mQ$ in  third row.
+Next, we describe the boundary transmission conditions at each interface in  first row of \Cref{tab:TransmissionConditions}. These are reformulated in terms of unknown \emph{Cauchy data} $\bu_i,\bu_j$, $i,j\in \{0,\cdots,M\}$, in second row, along with the expression of the transfert operator $\mX_{ij}$ in  third row, $\mI_{ij}$ being the identity operator on $\Gamma_{ij}$.
 
 In last row, we represent the adapted Sobolev tilde spaces for those transmission conditions (see \cite[Section 5.1]{claeys2014novel} \todo{def tilde for Maxwell}).
 \begin{table}[ht]
@@ -258,9 +259,9 @@ In last row, we represent the adapted Sobolev tilde spaces for those transmissio
 &  Acoustics & Electromagnetics \\ \hline
 \multirow{2}{*}{TC$(\U^i,\U^j)$} & $\U^i|_{\Gamma_{ij}} =\U^j|_{\Gamma_{ji}}$ & $\U^i|_{\Gamma_{ij}} \cdot \bn_i = - \U^j|_{\Gamma_{ji}}\cdot \bn_j $\\
 & $\mu_i^{-1}\bn_i \cdot \nabla \U^i|_{\Gamma_{ij}}  = -\mu_j^{-1} \bn_j \cdot \nabla \U^j|_{\Gamma_{ji}}$ & $\mu_i^{-1} (\bn_i \times \bcurl \U^i|_{\Gamma_{ij}}) = -\mu_j^{-1} (\bn_j \times \bcurl \U^j|_{\Gamma_{ji}}) $\\\hline
- \multirow{2}{*}{TC$(\fu^i,\fu^j)$}&\multirow{2}{*}{$\fu_i|_{\Gamma_{ij}}=\mQ \fu_j|_{\Gamma_{ji}}$} &\multirow{2}{*}{$\fu_i|_{\Gamma_{ij}}=\mQ \fu_j|_{\Gamma_{ji}}$} \\
+ \multirow{2}{*}{TC$(\fu^i,\fu^j)$}&\multirow{2}{*}{$\fu_i|_{\Gamma_{ij}}=-\mX_{ij} \fu_j|_{\Gamma_{ji}}$} &\multirow{2}{*}{$\fu_i|_{\Gamma_{ij}}=-\mX_{ij} \fu_j|_{\Gamma_{ji}}$} \\
  &&\\\hline
- \multirow{3}{*}{$\mQ$}&\multirow{3}{*}{$\begin{pmatrix} +1 & 0 \\ 0 & -1 \end{pmatrix}$} &\multirow{3}{*}{$\begin{pmatrix} -1 & 0 \\ 0 & -1 \end{pmatrix}$} \\
+ \multirow{3}{*}{$\mX_{ij}$}&\multirow{3}{*}{$\begin{pmatrix} - \mI_{ij} & 0 \\ 0 & \mI_{ij} \end{pmatrix}$} &\multirow{3}{*}{$\begin{pmatrix} \mI_{ij} & 0 \\ 0 & \mI_{ij}\end{pmatrix}$} \\
  &&\\ 
 &&\\\hline
  \multirow{2}{*}{$\widetilde{\IH}(\Gamma_{ij})$} &\multirow{2}{*}{$\tilde{H}^{-1/2}(\Gamma_{ij})\times \tilde{H}^{-1/2}(\Gamma_{ij}) $} &\multirow{2}{*}{ $\widetilde{\bH}_\times^{-1/2}(\divg_\Gamma, \Gamma)^2$} \\
@@ -329,31 +330,13 @@ We deduce the representation formulas for any \emph{radiating solution} (see \ci
 \label{eq:representation_formula}
 \U= \DL_k(\gamma_0 \U) - \SL_k(\gamma_1 \U) = \fR_k (\gamma\U)\textup{ in } \IR^3\backslash \Gamma,
 \ee
-and introduce the \emph{scaled multitrace operator} $\hat{\mA}$ as being
+and introduce the \emph{scaled multitrace operator} $\mA$ as being
 $$
-\hat{\mA}_k : = \left(\begin{array}{cc}-\mK_k&\mu\mV_k\\\frac{1}{\mu}\mW_k & \mK'_k\end{array}\right)\quad \textup{and} \quad\hat{\mA}_k : = \left(\begin{array}{cc}\mC_k&\frac{\mu}{k}\mS_k\\-\frac{k}{\mu}\mS_k& \mC_k\end{array}\right)
+\mA_k : = \left(\begin{array}{cc}-\mK_k&\mu\mV_k\\\frac{1}{\mu}\mW_k & \mK'_k\end{array}\right)\quad \textup{and} \quad\mA_k : = \left(\begin{array}{cc}\mC_k&\frac{\mu}{k}\mS_k\\-\frac{k}{\mu}\mS_k& \mC_k\end{array}\right),
 $$
 for acoustics and electromagnetics, respectively.
 
-\begin{table}[ht]
-\renewcommand\arraystretch{1.7}
-\begin{center}
-%\resizebox{9cm}{!} {
-\begin{tabular}{
-|c|c|c|}\hline
-&  Acoustics & Electromagnetics \\ \hline
-\multirow{3}{*}{$\hat{\mA}_i$}& \multirow{3}{*}{$\left(\begin{array}{cc}-\mK_i&\mu\mV_i\\\frac{1}{\mu}\mW_i & \mK'_i\end{array}\right)$}&\multirow{3}{*}{ $\left(\begin{array}{cc}\mC_i&\frac{\mu}{k}\mS_i\\-\frac{k}{\mu}\mS_i & \mC_i\end{array}\right)$}\\
- &&\\
-&&\\\hline
-\multirow{3}{*}{$\hat{\mI}_{ij}$}& \multirow{3}{*}{$\left(\begin{array}{cc} -\mI_j&0\\0 & \mI_j\end{array}\right)$}&\multirow{3}{*}{ $\left(\begin{array}{cc} \mI_j&0\\0 & \mI_j\end{array}\right)$}\\
-&&\\
-&&\\ \hline
-\end{tabular}%}
-\caption{Description of the multitrace boundary integral operator.}
-\label{tab:BoundaryOperators}
-\end{center} 
-\end{table} 
-Having defined the multitrace operator, we introduce the identity operator in trace space $\mI$ and provide the interior and exterior Calder\'on identities: \todo{Use scaled version}
+Having defined the multitrace operator, we introduce the identity operator in trace space $\mI$ and provide the interior and exterior (scaled) Calder\'on identities:
 \be
 \renewcommand\arraystretch{1.3}
 \label{eq:cald}\begin{array}{cl}
@@ -365,40 +348,36 @@ Having defined the multitrace operator, we introduce the identity operator in tr
 \begin{align*}
 \mI_{ij} &: = \chi_{ij} \mI_i= \chi_{ij} \mI_j,
 \end{align*}
-and we set the \emph{transfer operator} $\hat{\mX}_{ij}$ as being
+and we recall the expression of the \emph{transfer operator} $\mX_{ij}$ as being
 $$
-\hat{\mX}_{ij} : = \left(\begin{array}{cc}  -\mI_{ij} & 0\\0 &  \mI_{ij}\end{array}\right)\quad \textup{and} \quad\hat{\mX}_{ij} : = \left(\begin{array}{cc}  \mI_{ij} & 0\\0 &  \mI_{ij}\end{array}\right)
+\mX_{ij} : = \left(\begin{array}{cc}  -\mI_{ij} & 0\\0 &  \mI_{ij}\end{array}\right)\quad \textup{and} \quad\mX_{ij} : = \left(\begin{array}{cc}  \mI_{ij} & 0\\0 &  \mI_{ij}\end{array}\right),
 $$
 for acoustics and electromagnetics, respectively.
 
 
-We finally introduce $\hat{\fA}:= \textup{diag}(\hat{\mA}_i)$ and $\hat{\fX}:= (\hat{\fX}_{ij})_{i,j = 1}^M$.We arrive at the final formulation for the local MTF.
+Finally, we introduce $\fA:= \textup{diag}(\mA_i)$ and $\fX:= (\mX_{ij})_{i,j = 1}^M$. We arrive at the final formulation for the local MTF.
 \begin{problem}\label{pb:MTF}
 Seek $\bu \in \IH$ such that
 \be 
-(2\hat{\fA} - \hat{\fX}) \bu = - 2\bu_0^\textup{inc}.
+(2\fA + \fX) \bu = - 2\bu^\textup{inc}.
 \ee 
 \end{problem}
 \begin{proof}For $\Omega_0$, one has that that: 
 \be 
-\bu_0^\textup{sc} =  \left(\frac{1}{2}\mI_0+ \mA_0\right) \bu_0^\textup{sc}
+\bu_0^\textup{sc} =  \left(\frac{1}{2}\mI_0+ \mA_0\right) \bu_0^\textup{sc}\quad \text{and} \quad \bu_0^\textup{inc} =  \left(\frac{1}{2}\mI_0- \mA_0\right) \bu_0^\textup{inc},
 \ee 
-and 
-\be 
-\bu_0^\textup{inc} =  \left(\frac{1}{2}\mI_0- \mA_0\right) \bu_0^\textup{inc}
-\ee 
-hence
+hence the sum
 \begin{align*}
-\bu_0 &= \frac{1}{2} \bu_0  + \mA_0 \bu_0^\textup{sc} - \mA_0 \bu_0^\textup{inc}\\
-\frac{1}{2} \bu_0 &=   + \mA_0 \bu_0  - 2\mA_0 \bu_0^\textup{inc}\\
-\left(\frac{1}{2}\mI_0 - \mA_0\right)\bu_0 & = -2 \mA_0 \bu_0^\textup{inc}= \bu_0^\textup{inc}
+&\bu_0 = \frac{1}{2} \bu_0  + \mA_0 \bu_0^\textup{sc} - \mA_0 \bu_0^\textup{inc}\\
+&\Rightarrow \frac{1}{2} \bu_0 =   + \mA_0 \bu_0  - 2\mA_0 \bu_0^\textup{inc}\\
+&\Rightarrow \left(\frac{1}{2}\mI_0 - \mA_0\right)\bu_0  = -2 \mA_0 \bu_0^\textup{inc}= \bu_0^\textup{inc}
 \end{align*}
 
 We deduce the following relations: 
-\begin{align*}
-\left(\mA_{0} - \frac{1}{2}\mI_0  \right)\bu_0 &= -\bu_0^\textup{inc} \\
-\left(\mA_{m}-\frac{1}{2}\mI_m  \right)\bu_m &= 0
-\end{align*}
+$$
+\left(\mA_{0} - \frac{1}{2}\mI_0  \right)\bu_0 = -\bu_0^\textup{inc} \quad \text{and}
+\quad\left(\mA_{m}-\frac{1}{2}\mI_m  \right)\bu_m = 0.
+$$
 We rewrite transmission conditions as:
 \begin{align*}
 \bu_i &= \sum_{j \neq i} \bu_{i}|_{\Gamma_{ij}}\\
