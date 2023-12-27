@@ -15,7 +15,6 @@ pip install -e .
 pre-commit install
 ```
 ---
-![alt text](https://i.ibb.co/YQ9Bqpt/transformation.png)*<p align="center">Example of transformed boundaries respect to t meshed with 3,249 vertices.</p>*
 
 ## Cite this work: 
 
