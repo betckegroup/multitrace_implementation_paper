@@ -1,33 +1,28 @@
 import numpy as np
+import bempp.api
 
+def define_bempp_functions(config):
+    direction = config['direction']
+    polarization = config['polarization']
+    k0 = config['k_ext']
+    
+    def plane_wave(point):
+        return polarization * np.exp(1j * k0 * np.dot(point, direction))
 
-def plane_wave(point, k_ext, polarization, direction):
-    return polarization * np.exp(1j * k_ext * np.dot(point, direction))
-
-
-def scaled_plane_wave(point, k_ext, polarization, direction):
-    return plane_wave(point, k_ext, polarization, direction)
-
-
-def tangential_trace(k_ext, polarization, direction):
+    
+    @bempp.api.complex_callable
     def tangential_trace(point, n, domain_index, result):
-        result[:] = np.cross(
-            scaled_plane_wave(point, k_ext, polarization, direction), n
-        )
-
-    return tangential_trace
+        value = polarization * np.exp(1j * k0 * np.dot(point, direction))
+        result[:] = np.cross(value, n)
 
 
-def scaled_plane_wave_curl(point, k_ext, polarization, direction):
-    return np.cross(direction, polarization) * np.exp(
-        1j * k_ext * np.dot(point, direction)
-    )
-
-
-def neumann_trace(k_ext, polarization, direction):
+    @bempp.api.complex_callable
     def neumann_trace(point, n, domain_index, result):
-        result[:] = np.cross(
-            scaled_plane_wave_curl(point, k_ext, polarization, direction), n
+        value = (
+            np.cross(direction, polarization)
+            * 1j
+            * k0
+            * np.exp(1j * k0 * np.dot(point, direction))
         )
-
-    return neumann_trace
+        result[:] = 1.0 / (1j * k0) * np.cross(value, n)
+    return tangential_trace, neumann_trace

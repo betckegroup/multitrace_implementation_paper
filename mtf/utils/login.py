@@ -6,16 +6,6 @@ import scipy.sparse.linalg
 from bempp.api.assembly.boundary_operator import BoundaryOperator
 from bempp.api.assembly.grid_function import GridFunction
 
-
-def tensorize(x1, x2=None):
-    if x2 is None:
-        x2 = x1
-
-    x1 = np.array([x1])
-    x2 = np.array([x2])
-    return np.dot(x1.T, x2.conj())
-
-
 def rescale(A, d1, d2):
     # Rescale the 2x2 block operator matsrix A
     B = bempp.api.BlockedOperator(2, 2)

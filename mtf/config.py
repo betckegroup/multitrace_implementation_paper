@@ -11,7 +11,7 @@ def set_case(case="B"):
 
     # parameters
     # MIE
-    if case == "A" or case == "MC":
+    if case == "A":
         config["k_ext"] = 3.0
         config["eps_rel"] = 2.1
         config["mu_rel"] = 1.0
@@ -45,15 +45,13 @@ def set_case(case="B"):
         config["polarization"] = np.array([0.0, 0.0, 1.0])
         config["direction"] = np.array([1.0, 0.0, 0.0], dtype="float64")
 
-    # HPs
-
     # options for gmres
     if case == "A":
         config["restart"] = 10000
         config["maxiter"] = 10000
         config["tolerance"] = 1e-8
 
-    elif case == "B" or case == "MC":
+    elif case == "B":
         config["restart"] = 10000
         config["maxiter"] = 10000
         config["tolerance"] = 1e-6
@@ -62,11 +60,11 @@ def set_case(case="B"):
     if case == "A":
         config["spaces"] = "maxwell"  # or maxwell
         config["osrc"] = False
-    elif case == "B" or case == "MC":
+    elif case == "B":
         config["spaces"] = "maxwell_primal"  # or maxwell
         config["osrc"] = True
     # options for the Far Field at z=0
-    if case == "A" or case == "MC":
+    if case == "A":
         config["number_of_angles"] = 400
     elif case == "B":
         config["number_of_angles"] = 3601

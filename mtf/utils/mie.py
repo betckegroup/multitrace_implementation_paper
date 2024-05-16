@@ -57,7 +57,7 @@ def bhmie(x, refrel, nang):
     # computed number changed (out of 4*7001) and it only changed by 1/8387
     # conclusion: we are indeed retaining enough terms in series!
 
-    nstop = np.int(xstop)
+    nstop = int(xstop)
 
     if nmx > nmxx:
         print("error: nmx > nmxx=%f for |m|x=%f" % (nmxx, ymod))
@@ -74,7 +74,7 @@ def bhmie(x, refrel, nang):
     # Logarithmic derivative D(J) calculated by downward recurrence
     # beginning with initial value (0.,0.) at J=NMX
 
-    nn = np.int(nmx) - 1
+    nn = int(nmx) - 1
     d = np.zeros(nn + 1, dtype=np.complex128)
     for n in range(0, nn):
         en = nmx - n
