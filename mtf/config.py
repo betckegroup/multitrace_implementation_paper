@@ -50,12 +50,7 @@ def set_case(case="B", mie=True):
         config["direction"] = np.array(
             [1.0 / np.sqrt(14), 2.0 / np.sqrt(14), 3.0 / np.sqrt(14)], dtype="float64"
         )
-    # options for gmres
-    #if not mie:
-    #    config["restart"] = 10000
-    #    config["maxiter"] = 10000
-    #   config["tolerance"] = 1e-6
-    
+        
     # options for the Far Field at z=0
     config["number_of_angles"] = 400
     if mie:

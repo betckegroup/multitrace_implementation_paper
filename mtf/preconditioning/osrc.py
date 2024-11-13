@@ -14,6 +14,6 @@ class osrcMtE(BoundaryOperator):
         return self.wf
 
 def osrc_MtE(domain, range_, dual_to_range, p1d, wave_number, parameters=None):
-    mte = bempp.api.operators.boundary.maxwell.osrc_mte( [dual_to_range, p1d],  [dual_to_range, p1d],  [dual_to_range, p1d], wave_number)
+    mte = bempp.api.operators.boundary.maxwell.osrc_mte( [dual_to_range, p1d],  [dual_to_range, p1d],  [dual_to_range, p1d], wave_number)#, type=2)
     wf = mte._assemble()
     return osrcMtE(wf, domain, domain, dual_to_range, parameters)
