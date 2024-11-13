@@ -2,6 +2,9 @@
 
 We study and verify the convergence of the local MTF for a unit sphere, comparing the STF to local MTF for $M=2$ and $M=3$ (i.e. scattering by two half-spheres).
 
+- Script for STF(2): `stf.py`;
+- Script for MTF(2) and MTF(3): `local_mtf.py`.
+
 To plot the solution for cases A and B and `precision = 10`, use the Notebook: `mtf.ipynb`.
 
 To generate all the simulations for convergence:
@@ -29,3 +32,4 @@ bash run_mtf_gmres.bash # Set case A and B
 ```
 
 Next, plot the figures through: `plot_results.ipynb`.
+
