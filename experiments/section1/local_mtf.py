@@ -48,6 +48,15 @@ elif M == 3:
     swapped_normals = [[10, 20], [], [12]]
 
 
+## Same for the multishape
+if shape == 'cube':
+    segments = [[1, 2, 3, 4, 5, 7, 8, 9, 10, 11],
+                [1, 2, 3, 4, 5, 6],
+                [6, 7, 8, 9, 10, 11]]
+    
+    swapped_normals = [[1, 2, 3, 4, 5, 7, 8, 9, 10, 11],[],[6]]
+~~
+
 # Outside: k_ext
 # Inside: k_int
 

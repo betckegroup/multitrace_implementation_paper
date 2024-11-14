@@ -104,8 +104,8 @@ def assemble_mtf(grid, params, config, solver='gmres'):
         mfie = bempp.api.operators.boundary.maxwell.magnetic_field(dA[index], rA[index], tA[index], k)
         multitrace_ops.append(GeneralizedBlockedOperator([[mfie, eta * efie],[- 1/eta * efie, mfie]]))
         if solver == 'gmres':
-            osrc = osrc_MtE(dA[index], rA[index], tA[index], p1dA[index], k)
-            zero = (1+1j) * bempp.api.ZeroBoundaryOperator(dA[index], rA[index], tA[index])
+            osrc = osrc_MtE(dA[index], dA[index], tA[index], p1dA[index], k)
+            zero = (1+1j) * bempp.api.ZeroBoundaryOperator(dA[index], dA[index], tA[index])
             osrc_ops.append(GeneralizedBlockedOperator([[zero, eta * osrc],[- 1/eta * osrc, zero]]))
 
     
@@ -146,7 +146,7 @@ def assemble_mtf(grid, params, config, solver='gmres'):
               block_osrc[i][j] = 2 * osrc_ops[i]
             else:
               op = BlockedOperator(2, 2)
-              zero = ZeroBoundaryOperator(dA[j], rA[i], tA[i])
+              zero = ZeroBoundaryOperator(dA[j], dA[i], tA[i])
               op[0, 0] = zero
               op[1, 1] = zero
               block_osrc[i][j] = op
