@@ -145,11 +145,25 @@ def assemble_mtf(grid, params, config, solver='gmres'):
             if i == j:
               block_osrc[i][j] = 2 * osrc_ops[i]
             else:
-              op = BlockedOperator(2, 2)
-              zero = ZeroBoundaryOperator(dA[j], dA[i], tA[i])
-              op[0, 0] = zero
-              op[1, 1] = zero
-              block_osrc[i][j] = op
+              all = segments[i] + segments[j]
+              non_disjoint = np.unique(all).shape[0] != len(all)
+              
+              if non_disjoint:
+                ident = identity(dA[j], rA[i], tA[i])
+                op = BlockedOperator(2, 2)
+                #op[0, 0] = -ident
+                op[0, 0] = ident
+                op[1, 1] = ident
+                op.weak_form()
+                #op[1, 1] = ident
+                block_osrc[i][j] = op
+              else:
+                op = BlockedOperator(2, 2)
+                zero = ZeroBoundaryOperator(dA[j], rA[i], tA[i])
+                op[0, 0] = zero
+                op[1, 1] = zero
+                block_osrc[i][j] = op
+
         P_op = GeneralizedBlockedOperator(block_osrc)
         
 
