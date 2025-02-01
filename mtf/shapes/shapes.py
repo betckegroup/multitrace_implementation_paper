@@ -1,71 +1,8 @@
 import bempp.api
 import numpy as np
+from bempp.api.shapes.shapes import get_gmsh_file,__generate_grid_from_gmsh_string,__generate_grid_from_geo_string
 
 _l_s = 0
-
-
-def get_gmsh_file():
-    """
-    Return a 3-tuple (geo_file,geo_name,msh_name), where
-    geo_file is a file descriptor to an empty .geo file, geo_name is
-    the corresponding filename and msh_name is the name of the
-    Gmsh .msh file that will be generated.
-
-    """
-    import os
-    import tempfile
-
-    geo, geo_name = tempfile.mkstemp(suffix=".geo", dir=bempp.api.TMP_PATH, text=True)
-    geo_file = os.fdopen(geo, "w")
-    msh_name = os.path.splitext(geo_name)[0] + ".msh"
-    return (geo_file, geo_name, msh_name)
-
-
-def __generate_grid_from_gmsh_string(gmsh_string):
-    """Return a grid from a string containing a gmsh mesh"""
-
-    import os
-    import tempfile
-
-    handle, fname = tempfile.mkstemp(suffix=".msh", dir=bempp.api.TMP_PATH, text=True)
-    with os.fdopen(handle, "w") as f:
-        f.write(gmsh_string)
-    grid = bempp.api.import_grid(fname)
-    os.remove(fname)
-    return grid
-
-
-def __generate_grid_from_geo_string(geo_string):
-    """Helper routine that implements the grid generation"""
-
-    import os
-    import subprocess
-
-    def msh_from_string(geo_string):
-        gmsh_command = bempp.api.GMSH_PATH
-        if gmsh_command is None:
-            raise RuntimeError("Gmsh is not found. Cannot generate mesh")
-        f, geo_name, msh_name = get_gmsh_file()
-        f.write(geo_string)
-        f.close()
-
-        fnull = open(os.devnull, "w")
-        cmd = gmsh_command + " -2 " + geo_name
-        try:
-            subprocess.check_call(cmd, shell=True, stdout=fnull, stderr=fnull)
-        except SystemExit:
-            print("The following command failed: " + cmd)
-            fnull.close()
-            raise
-        os.remove(geo_name)
-        fnull.close()
-        return msh_name
-
-    msh_name = msh_from_string(geo_string)
-    grid = bempp.api.import_grid(msh_name)
-    os.remove(msh_name)
-    return grid
-
 
 def _make_word(geo, h):
     intro = "lc = " + str(h) + ";\n"
@@ -1570,3 +1507,82 @@ def multitrace_cube(h=0.1):
     return __generate_grid_from_geo_string(geometry)
 
 
+def composite(h=1., z=1., r=[0.5, 1, 1.5, 1.7], cube=True):
+    if cube == True:
+        stub0 = ""
+    else:
+        stub0 = """
+Point(1) = {0, 0, 0, cl};"""
+    
+    stub1 = """
+For i In {0:(N-1)}
+    r = r[i];"""
+    if cube == True:
+        stub2 = """
+    Point(1+4*i) = {-r,-r, 0, cl};
+    Point(2+4*i) = {r,-r, 0, cl};
+    Point(3+4*i) = {r,r, 0, cl};
+    Point(4+4*i) = {-r,r, 0, cl};
+
+    Line(1+4*i) = {1+4*i,2+4*i};
+    Line(2+4*i) = {2+4*i,3+4*i};
+    Line(3+4*i) = {3+4*i,4+4*i};
+    Line(4+4*i) = {4+4*i,1+4*i};"""
+    else:
+        stub2 = """
+    Point(2+4*i) = {r,0, 0, cl};
+    Point(3+4*i) = {0,r, 0, cl};
+    Point(4+4*i) = {-r,0, 0, cl};
+    Point(5+4*i) = {0,-r, 0, cl};
+
+    Circle(1+4*i) = {2+4*i, 1, 3+4*i};
+    Circle(2+4*i) = {3+4*i, 1, 4+4*i};
+    Circle(3+4*i) = {4+4*i, 1, 5+4*i};
+    Circle(4+4*i) = {5+4*i, 1, 2+4*i};
+        """
+    stub3 = """
+    Line Loop(11+i) = {3+4*i, 4+4*i, 1+4*i, 2+4*i};
+
+    If (i==0)
+        Plane Surface(21) = {11};
+    Else
+        Plane Surface(21 + 3*i) = {11+i, -(11 + i - 1)};
+    EndIf
+EndFor
+
+For i In {0:(N-1)}
+    Printf("i = %g", i);
+    out[] = Extrude {0,0,z} {Surface{21+3*i}; Layers{cl};};     
+    //Physical Surface(21 + 3*i) = {21+3*i};
+    //Physical Surface(22 + 3*i) = {out[0]}; 
+    //Physical Surface(23 + 3*i) = {out[2], out[3], out[4], out[5]}; 
+    Reverse Surface{21+3*i};
+
+    If (i < (N-1))
+    Physical Surface(10 * (i+1)) = {21+3*i, out[0]};
+    Physical Surface(10 * (i+2) + (i+1)) = {out[2], out[3], out[4], out[5]};
+    Else
+    Physical Surface(10 * (i+1)) = {21+3*i, out[0],out[2], out[3], out[4], out[5]};
+    EndIf
+EndFor
+
+//Delete Physicals;
+
+
+For i In {1:N}
+    b() = Boundary{Volume{i};};
+    Printf("--------");
+    sb = #b[];
+    For j In {0:(sb-1)}
+        Printf("b0= %g", b[j]);
+    EndFor
+
+EndFor
+
+Mesh.Algorithm = 6;
+    """
+    geometry = ("N = " + str(len(r)) + ";\n" +"cl = " + str(h) + ";\n" +
+    "z =" + str(z) + ";\n" +
+    "r[] = {" + str(r)[1:-1] + "};\n" +
+    stub0+stub1+stub2+stub3)
+    return __generate_grid_from_geo_string(geometry)

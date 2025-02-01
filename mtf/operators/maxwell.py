@@ -6,6 +6,7 @@ from mtf.preconditioning.osrc import osrc_MtE
 import numpy as np
 from bempp.api.operators.boundary.sparse import identity
 from bempp.api import ZeroBoundaryOperator
+import time 
 
 def assemble_stf(grid, params, config, solver='gmres'):
 
@@ -65,7 +66,7 @@ def assemble_stf(grid, params, config, solver='gmres'):
     else:
         return lhs_op, rhs
 
-def assemble_mtf(grid, params, config, solver='gmres'):
+def assemble_mtf(grid, params, config, solver='gmres', osrc_type=None):
 
     tangential_trace, neumann_trace = define_bempp_functions(config)
     
@@ -104,13 +105,15 @@ def assemble_mtf(grid, params, config, solver='gmres'):
         mfie = bempp.api.operators.boundary.maxwell.magnetic_field(dA[index], rA[index], tA[index], k)
         multitrace_ops.append(GeneralizedBlockedOperator([[mfie, eta * efie],[- 1/eta * efie, mfie]]))
         if solver == 'gmres':
-            osrc = osrc_MtE(dA[index], dA[index], tA[index], p1dA[index], k)
+            osrc = osrc_MtE(dA[index], dA[index], tA[index], p1dA[index], k, osrc_type)
             zero = (1+1j) * bempp.api.ZeroBoundaryOperator(dA[index], dA[index], tA[index])
             osrc_ops.append(GeneralizedBlockedOperator([[zero, eta * osrc],[- 1/eta * osrc, zero]]))
 
     
         # Define the final operator
-        
+    print('Impedance: Starting the assembly')
+    ta = time.time()
+
     block_system = [M * [None] for _ in range(M)]
     
     for i in range(M):
@@ -136,8 +139,15 @@ def assemble_mtf(grid, params, config, solver='gmres'):
             op[0, 0] = zero
             op[1, 1] = zero
             block_system[i][j] = op
+    lhs_op = GeneralizedBlockedOperator(block_system)              
+    ta = time.time() - ta
+    print(ta, 'ta-int')
 
+    
     if solver == 'gmres':
+        print('Preconditioner: Starting the assembly')
+        tc = time.time()
+
         # Define the final operator
         block_osrc = [M * [None] for _ in range(M)]
         for i in range(M):
@@ -165,9 +175,10 @@ def assemble_mtf(grid, params, config, solver='gmres'):
                 block_osrc[i][j] = op
 
         P_op = GeneralizedBlockedOperator(block_osrc)
-        
+        tc = time.time() - tc
+        print(tc, 'tc-int')
 
-    lhs_op = GeneralizedBlockedOperator(block_system)
+    
     
     rhs = [2 * bempp.api.GridFunction(rA[0], dual_space = tA[0], fun=tangential_trace),
           2 * bempp.api.GridFunction(rA[0], dual_space = tA[0], fun=neumann_trace)]
@@ -180,5 +191,3 @@ def assemble_mtf(grid, params, config, solver='gmres'):
         return P_op, lhs_op, rhs
     else:
         return lhs_op, rhs
-
-        
